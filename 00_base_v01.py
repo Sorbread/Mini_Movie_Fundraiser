@@ -82,6 +82,7 @@ while tickets_sold < MAX_TICKETS:
         print("instructions")
 
     # Get Age
+    age = get_age("Please enter your age: ")
 
     # Increment Tickets Sold
     tickets_sold += 1
