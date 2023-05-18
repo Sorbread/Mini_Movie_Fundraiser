@@ -2,6 +2,13 @@
 # The base program for 'Mini Movie Fundraiser'
 # Made to buy tickets for movie
 
+import pandas
+
+
+# currency formatting function
+def currency(x):
+    return "${:.2f}".format(x)
+
 
 # yn(inp_text) - Ask a yes/no question
 # Returns only 'y' or 'n' depending on user answer.
@@ -68,7 +75,9 @@ def string_check(inp_text, valid_responses):
         if answer in valid_responses:
             return answer
         else:
-            print("Please enter valid response. ")
+            print(
+                f"Please enter valid response, such as '{valid_responses[0]}' or '{valid_responses[1]}' "
+            )
 
 
 # Ticket prices for age categories
@@ -87,8 +96,13 @@ def calc_ticket_price(age):
         category = "senior"
     category_to_price = TICKET_PRICE[category]
 
-    return age, category, category_to_price
+    return category, category_to_price
 
+
+# dictionaries to hold ticket details
+all_names = []
+all_ticket_costs = []
+all_surcharge = []
 
 # Constant, for testing purposes set to low number (e.g. 3)
 MAX_TICKETS = 3
@@ -104,6 +118,9 @@ tickets_sold = 0
 
 # Main loop
 while tickets_sold < MAX_TICKETS:
+    # Makes easier to see next input
+    print("\n\n")
+
     # Get Name
     name = get_input("Please enter your name or 'xxx' to exit: ")
 
@@ -122,14 +139,82 @@ while tickets_sold < MAX_TICKETS:
 
     # Get Age
     age = get_number("Please enter your age: ", MIN_AGE, MAX_AGE)
+    # Calculate string version of age (e.g. 'child') and  ticket price (e.g. 7.50)
+    age_stringified, ticket_price = calc_ticket_price(age)
+    print(f"A ticket for a {age} year old person will cost you ${ticket_price:.2f}.")
+
+    # Ask if this is the correct information, or exit out
+    if yn("Would you like to continue? (Y/N): ") == "n":
+        print("Thank you for your time.")
+        continue
 
     payment_method = string_check(
         "Please enter your payment method (credit/cash): ",
         ["cr", "credit", "ca", "cash"],
     )
 
+    # Calculate surcharge
+    surcharge = 0
+    if payment_method == "cr" or payment_method == "credit":
+        surcharge = ticket_price * 0.05
+        print(f"Credit will cost you ${surcharge:.2f} more.")
+
+    total_cost = ticket_price + surcharge
+    # Final confirmation of purchase
+    if (
+        yn(
+            f"Would you like to confirm your payment of ${total_cost:.2f} for one {age_stringified} ticket? (Y/N): "
+        )
+        == "n"
+    ):
+        continue
+
+    # Add data to final
+    all_names.append(name)
+    all_ticket_costs.append(ticket_price)
+    all_surcharge.append(surcharge)
+
     # Increment Tickets Sold
     tickets_sold += 1
 
+mini_movie_dict = {
+    "Name": all_names,
+    "Ticket Price": all_ticket_costs,
+    "Surcharge": all_surcharge,
+}
+# Set frame for our data
+mini_movie_frame = pandas.DataFrame(mini_movie_dict)
+mini_movie_frame = mini_movie_frame.set_index("Name")
+
+# calculate the total ticket cost (ticket + surcharge)
+mini_movie_frame["Total"] = (
+    mini_movie_frame["Ticket Price"] + mini_movie_frame["Surcharge"]
+)
+
+# calculate the profit for each ticket
+mini_movie_frame["Profit"] = mini_movie_frame["Ticket Price"] - 5
+
+# calculate ticket and profit totals
+total = mini_movie_frame["Total"].sum()
+profit = mini_movie_frame["Profit"].sum()
+
+# currency formatting (calling currency function)
+add_dollars = ["Ticket Price", "Surcharge", "Total", "Profit"]
+for var_item in add_dollars:
+    mini_movie_frame[var_item] = mini_movie_frame[var_item].apply(currency)
+
+print("---- Ticket Data ----\n")
+
+# output table with ticket data
+print(mini_movie_frame)
+print("\n---- Ticket Cost / Profit ----\n")
+print("Total Ticket Sales: ${:.2f}".format(total))
+print("Total Profit: ${:.2f}".format(profit))
+
+# ending component
 if tickets_sold == MAX_TICKETS:
-    print("Congratulations, you have sold all the available tickets.")
+    print("\nCongratulations, you have sold all the available tickets")
+else:
+    print(
+        f"\nYou have sold {tickets_sold} ticket/s. There is {MAX_TICKETS - tickets_sold} ticket/s remaining."
+    )
