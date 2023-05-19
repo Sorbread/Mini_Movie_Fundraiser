@@ -1,8 +1,8 @@
 # 00_base_v01.py
 # The base program for 'Mini Movie Fundraiser'
 # Made to buy tickets for movie
-
 import pandas
+import random
 
 
 # currency formatting function
@@ -184,7 +184,6 @@ mini_movie_dict = {
 }
 # Set frame for our data
 mini_movie_frame = pandas.DataFrame(mini_movie_dict)
-mini_movie_frame = mini_movie_frame.set_index("Name")
 
 # calculate the total ticket cost (ticket + surcharge)
 mini_movie_frame["Total"] = (
@@ -193,6 +192,15 @@ mini_movie_frame["Total"] = (
 
 # calculate the profit for each ticket
 mini_movie_frame["Profit"] = mini_movie_frame["Ticket Price"] - 5
+
+# choose a winner from our name list
+winner_name = random.choice(all_names)
+
+# get position of winner name in list
+winner_index = all_names.index(winner_name)
+
+# look up total amount won (ticket price + surcharge)
+total_won = mini_movie_frame.at[winner_index, "Total"]
 
 # calculate ticket and profit totals
 total = mini_movie_frame["Total"].sum()
@@ -203,13 +211,21 @@ add_dollars = ["Ticket Price", "Surcharge", "Total", "Profit"]
 for var_item in add_dollars:
     mini_movie_frame[var_item] = mini_movie_frame[var_item].apply(currency)
 
-print("---- Ticket Data ----\n")
+mini_movie_frame = mini_movie_frame.set_index("Name")
 
-# output table with ticket data
-print(mini_movie_frame)
-print("\n---- Ticket Cost / Profit ----\n")
-print("Total Ticket Sales: ${:.2f}".format(total))
-print("Total Profit: ${:.2f}".format(profit))
+if tickets_sold > 0:
+    print("---- Ticket Data ----\n")
+
+    # output table with ticket data
+    print(mini_movie_frame)
+    print("\n---- Ticket Cost / Profit ----\n")
+    print("Total Ticket Sales: ${:.2f}".format(total))
+    print("Total Profit: ${:.2f}".format(profit))
+
+    print("\n---- Raffle Winner ----")
+    print(
+        f"\nCongratulations {winner_name}. You have won ${total_won :.2f} ie: your ticket is free!\n\n\n"
+    )
 
 # ending component
 if tickets_sold == MAX_TICKETS:
