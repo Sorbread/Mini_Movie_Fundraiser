@@ -223,6 +223,10 @@ sales_status = "\nAll tickets have been sold."
 if tickets_sold != MAX_TICKETS:
     sales_status = f"\nYou have sold {sales_status}."
 
+# calculate ticket and profit totals
+total = mini_movie_frame["Total"].sum()
+profit = mini_movie_frame["Profit"].sum()
+
 # Ticket heading & text
 ticket_cost_heading = "\n---- Ticket Cost / Profit ----"
 total_ticket_sales = "Total Ticket Sales: ${:.2f}".format(total)
