@@ -11,6 +11,29 @@ def currency(x):
     return "${:.2f}".format(x)
 
 
+# Shows instructions
+def show_instructions():
+    print(
+        """\n
+***** Instructions *****
+
+For each ticket, enter ...
+ - The person's name (can't be blank)
+ - Age (between 12 and 120)
+ - Payment method (cash / credit)
+ 
+When you have entered all the useres, press 'xxx' to quit.
+
+The program will then display the ticket details
+including the cost of each ticket, the total cost
+and the total profit.
+
+This information will also be automatically written to a text file.
+
+**************************"""
+    )
+
+
 # yn(inp_text) - Ask a yes/no question
 # Returns only 'y' or 'n' depending on user answer.
 # Handles incorrect inputs by asking question again.
@@ -136,7 +159,7 @@ while tickets_sold < MAX_TICKETS:
     # Ask user if they need instructions
     want_instructions = yn("Do you want to read the instructions? (Y/N): ")
     if want_instructions == "y":
-        print("instructions")
+        show_instructions()
 
     # Get Age
     age = get_number("Please enter your age: ", MIN_AGE, MAX_AGE)
