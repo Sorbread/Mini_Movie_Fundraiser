@@ -3,6 +3,7 @@
 # Made to buy tickets for movie
 import pandas
 import random
+from datetime import date
 
 
 # currency formatting function
@@ -202,35 +203,52 @@ winner_index = all_names.index(winner_name)
 # look up total amount won (ticket price + surcharge)
 total_won = mini_movie_frame.at[winner_index, "Total"]
 
-# calculate ticket and profit totals
-total = mini_movie_frame["Total"].sum()
-profit = mini_movie_frame["Profit"].sum()
+# Get Date
+today = date.today()
 
-# currency formatting (calling currency function)
-add_dollars = ["Ticket Price", "Surcharge", "Total", "Profit"]
-for var_item in add_dollars:
-    mini_movie_frame[var_item] = mini_movie_frame[var_item].apply(currency)
+day = today.strftime("%d")
+month = today.strftime("%m")
+year = today.strftime("%y")
 
-mini_movie_frame = mini_movie_frame.set_index("Name")
+# Main Heading
+heading = "---- Mini Movie Fundraiser Ticket Date ({}/{}/{}) ----\n".format(
+    day, month, year
+)
+filename = "MMF_{}_{}_{}".format(day, month, year)
 
-if tickets_sold > 0:
-    print("---- Ticket Data ----\n")
+mini_movie_string = pandas.DataFrame.to_string(mini_movie_frame)
+MAX_TICKETS = 10
 
-    # output table with ticket data
-    print(mini_movie_frame)
-    print("\n---- Ticket Cost / Profit ----\n")
-    print("Total Ticket Sales: ${:.2f}".format(total))
-    print("Total Profit: ${:.2f}".format(profit))
+sales_status = "\nAll tickets have been sold."
+if total != MAX_TICKETS:
+    sales_status = f"\nYou have sold {sales_status}."
 
-    print("\n---- Raffle Winner ----")
-    print(
-        f"\nCongratulations {winner_name}. You have won ${total_won :.2f} ie: your ticket is free!\n\n\n"
-    )
+# Ticket heading & text
+ticket_cost_heading = "\n---- Ticket Cost / Profit ----"
+total_ticket_sales = "Total Ticket Sales: ${:.2f}".format(total)
+total_profit = "Total Profit: ${:.2f}".format(profit)
 
-# ending component
-if tickets_sold == MAX_TICKETS:
-    print("\nCongratulations, you have sold all the available tickets")
-else:
-    print(
-        f"\nYou have sold {tickets_sold} ticket/s. There is {MAX_TICKETS - tickets_sold} ticket/s remaining."
-    )
+# Raffle heading & text
+winner_heading = "\n---- Raffle Winner ----"
+winner_text = f"\nCongratulations to {winner_name}. They have won ${total_won :.2f} ie: their ticket is free!"
+
+to_write = [
+    heading,
+    mini_movie_string,
+    ticket_cost_heading,
+    total_ticket_sales,
+    total_profit,
+    sales_status,
+    winner_heading,
+    winner_text,
+]
+
+for item in to_write:
+    print(item)
+
+write_to = f"{filename}.txt"
+text_file = open(write_to, "w+")
+for item in to_write:
+    text_file.write(item)
+    text_file.write("\n")
+text_file.close()
