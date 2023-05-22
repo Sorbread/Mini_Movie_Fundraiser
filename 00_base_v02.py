@@ -220,7 +220,7 @@ mini_movie_string = pandas.DataFrame.to_string(mini_movie_frame)
 MAX_TICKETS = 10
 
 sales_status = "\nAll tickets have been sold."
-if total != MAX_TICKETS:
+if tickets_sold != MAX_TICKETS:
     sales_status = f"\nYou have sold {sales_status}."
 
 # Ticket heading & text
